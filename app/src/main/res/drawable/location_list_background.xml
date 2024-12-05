@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/location_list_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#1E1E2D" /> <!-- Chọn màu nền phù hợp -->
+    <corners android:radius="12dp" /> <!-- Bo tròn góc -->
+</shape>
