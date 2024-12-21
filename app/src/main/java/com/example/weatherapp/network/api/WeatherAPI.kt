@@ -2,6 +2,7 @@ package com.example.weatherapp.network.api
 
 import com.example.weatherapp.data.RemoteLocation
 import com.example.weatherapp.data.RemoteWeatherData
+import com.example.weatherapp.data.RemoteWeatherFullData
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -23,4 +24,10 @@ interface WeatherAPI {
         @Query("q") query: String
     ): Response<RemoteWeatherData>
 
+    // Thêm phương thức mới phần này có thể tự nâng cấp về sau
+    @GET("current.json")
+    suspend fun getRemoteWeatherFullData(
+        @Query("key") key: String = API_KEY,
+        @Query("q") query: String
+    ): Response<RemoteWeatherFullData>
 }

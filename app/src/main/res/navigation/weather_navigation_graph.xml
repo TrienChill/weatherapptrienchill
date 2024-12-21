@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/weather_navigation_graph"
     app:startDestination="@id/homeFragment">
+
+    <!-- Home Fragment -->
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.weatherapp.fragments.home.HomeFragment"
@@ -11,14 +13,43 @@
         tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_home_fragment_to_location_fragment"
-            app:destination="@+id/locationFragment"/>
+            app:destination="@id/locationFragment" />
     </fragment>
 
+    <!-- Location Fragment -->
     <fragment
         android:id="@+id/locationFragment"
         android:name="com.example.weatherapp.fragments.location.LocationFragment"
-        tools:layout="@layout/fragment_location"
+        tools:layout="@layout/fragment_location" />
 
-        />
+    <!-- Manager Location Fragment -->
+    <fragment
+        android:id="@+id/managerLocationFragment"
+        android:name="com.example.weatherapp.fragments.manager_location.ManagerLocationFragment"
+        android:label="Quản lý vị trí"
+        tools:layout="@layout/fragment_manager_location" />
+    <!-- report Fragment -->
+    <fragment
+        android:id="@+id/reportFragment"
+        android:name="com.example.weatherapp.fragments.report.ReportFragment"
+        android:label="Báo cáo"
+        tools:layout="@layout/fragment_report" />
+
+    <!-- setting Fragment -->
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.weatherapp.fragments.settings.SettingsFragment"
+        android:label="Cài đặt"
+        tools:layout="@layout/fragment_settings">
+        <action
+            android:id="@+id/action_settingsFragment_to_weatherInfoFragment"
+            app:destination="@id/weatherInfoFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/weatherInfoFragment"
+        android:name="com.example.weatherapp.fragments.settings.WeatherInfoFragment"
+        android:label="Thông tin ứng dụng thời tiết"
+        tools:layout="@layout/fragment_weather_info" />
 
 </navigation>

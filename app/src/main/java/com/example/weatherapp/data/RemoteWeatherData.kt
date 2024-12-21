@@ -34,6 +34,5 @@ data class ForecastHourRemote(
     )
 
 data class WeatherConditionRemote(
-    val icon: String,
-
+    val icon: String
 )

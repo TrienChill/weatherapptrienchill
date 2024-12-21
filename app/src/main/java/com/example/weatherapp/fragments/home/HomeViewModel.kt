@@ -1,6 +1,10 @@
 package com.example.weatherapp.fragments.home
 
+import android.content.ContentValues.TAG
+import android.content.Context
+import android.content.Intent
 import android.location.Geocoder
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,12 +14,15 @@ import com.example.weatherapp.data.CurrentWeather
 import com.example.weatherapp.data.Forecast
 import com.example.weatherapp.data.LiveDataEvent
 import com.example.weatherapp.network.repositoty.WeatherDataRepository
+import com.example.weatherapp.utils.NotificationHelper
 import com.google.android.gms.location.FusedLocationProviderClient
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class HomeViewModel(private val weatherDataRepository: WeatherDataRepository) : ViewModel(){
+class HomeViewModel(private val weatherDataRepository: WeatherDataRepository
+
+) : ViewModel(){
 
     //region Current location
     private val _currentLocation = MutableLiveData< LiveDataEvent<CurrentLocationDataState>>()
@@ -132,6 +139,81 @@ class HomeViewModel(private val weatherDataRepository: WeatherDataRepository) : 
         return SimpleDateFormat("HH:mm", Locale.getDefault()).format(date)
 
     }
+    //endregion
+
+    //region Weather data context và thêm nhiều phần khác full data
+    fun getWeatherDataWithContext(latitude: Double, longitude: String, context: Context) {
+        viewModelScope.launch {
+            emitWeatherDataUiState(isLoading = true)
+            weatherDataRepository.getWeatherData(latitude, longitude)?.let { weatherData ->
+                val currentWeather = CurrentWeather(
+                    icon = weatherData.current.condition.icon,
+                    temperature = weatherData.current.temperature,
+                    wind = weatherData.current.wind,
+                    humidity = weatherData.current.humidity,
+                    chanceOfRain = weatherData.forecast.forecastDays.first().day.chanceOfRain
+                )
+
+                // Save weather data to SharedPreferences
+                saveWeatherDataToSharedPrefs(context, currentWeather)
+
+                // Cập nhật LiveData
+                emitWeatherDataUiState(
+                    currentWeather = currentWeather,
+                    forecast = weatherData.forecast.forecastDays.first().hour.map {
+                        Forecast(
+                            time = getForecastTime(it.time),
+                            temperature = it.temperature,
+                            feelsLikeTemperature = it.feelsLikeTemperature,
+                            icon = it.condition.icon
+                        )
+                    }
+                )
+                // Hiển thị thông báo thời tiết
+                sendWeatherNotification(context, "Vị trí của bạn", currentWeather)
+                // Gửi Broadcast
+                sendWeatherDataBroadcast(context, currentWeather)
+            } ?: emitWeatherDataUiState(error = "Failed to get weather data")
+        }
+    }
+
+
+
+
+
+
+    private fun saveWeatherDataToSharedPrefs(context: Context, currentWeather: CurrentWeather) {
+        val sharedPreferences = context.getSharedPreferences("WeatherPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        editor.putString("weatherIcon", currentWeather.icon)
+        editor.putInt("temperature", currentWeather.temperature.toInt())
+        editor.putString("weatherName", "Current Weather") // Or any other name you want to store
+        editor.apply()
+
+        Log.d(TAG, "Weather data saved to SharedPreferences: Icon=${currentWeather.icon}, Temp=${currentWeather.temperature}")
+    }
+
+    private fun sendWeatherDataBroadcast(context: Context, currentWeather: CurrentWeather) {
+        val intent = Intent("com.example.weatherapp.WEATHER_DATA_UPDATED")
+        intent.putExtra("icon", currentWeather.icon)
+        intent.putExtra("temperature", currentWeather.temperature)
+        context.sendBroadcast(intent)
+    }
+
 
     //endregion
+
+    //region Thông báo
+    private fun sendWeatherNotification(context: Context, location: String, currentWeather: CurrentWeather) {
+        val notificationHelper = NotificationHelper(context)
+        val forecast = "Nhiệt độ: ${currentWeather.temperature}°C, Độ ẩm: ${currentWeather.humidity}%, Gió: ${currentWeather.wind} km/h"
+        notificationHelper.showWeatherNotification(
+            location = location,
+            status = "Hiện tại: ${currentWeather.temperature}°C",
+            forecast = forecast
+        )
+    }
+    //endregion
+
 }

@@ -15,11 +15,13 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.fragment.findNavController
 import com.example.weatherapp.R
 import com.example.weatherapp.data.CurrentLocation
+import com.example.weatherapp.data.CurrentWeather
 import com.example.weatherapp.databinding.FragmentHomeBinding
 import com.example.weatherapp.storage.SharedPreferencesManager
 import com.google.android.gms.location.LocationServices
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.Calendar
 
 
 class HomeFragment : Fragment() {
@@ -113,6 +115,7 @@ class HomeFragment : Fragment() {
                 binding.swipeRefreshLayout.isRefreshing = weatherDataState.isLoading
                 weatherDataState.currentWeather?.let { currentWeather ->
                     weatherDataAdapter.setCurrentWeather(currentWeather)
+                    updateBackground(currentWeather) // Update background here
                 }
                 weatherDataState.forecast?.let { forecast ->
                     weatherDataAdapter.setForecastData(forecast)
@@ -133,7 +136,8 @@ class HomeFragment : Fragment() {
         weatherDataAdapter.setCurrentLocation(currentLocation ?: CurrentLocation())
         currentLocation?.let {
             getWeatherData(currentLocation = it)
-        }
+            getWeatherDataWithContext(currentLocation = it)//thêm phần này
+         }
     }
 
 
@@ -220,5 +224,40 @@ class HomeFragment : Fragment() {
             )
         }
     }
+
+    //add phần này
+    private fun getWeatherDataWithContext(currentLocation: CurrentLocation) {
+        if (currentLocation.latitude != null && currentLocation.longitude != null) {
+            homeViewModel.getWeatherDataWithContext(
+                latitude = currentLocation.latitude,
+                longitude = currentLocation.longitude.toString(),
+                context = requireContext()  // Gửi context vào để lưu dữ liệu vào SharedPreferences
+            )
+        }
+    }
+
+    //thêm background
+    private fun updateBackground(currentWeather: CurrentWeather?) {
+        val calendar = Calendar.getInstance()
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        val temperature = currentWeather?.temperature ?: 20.0f // Default temperature if null
+
+        // Đảm bảo rằng backgroundRes là một ID tài nguyên hợp lệ
+        val backgroundRes = when {
+            temperature <= 0 -> R.drawable.bg_snow
+            hour in 6..11 -> R.drawable.bg_morning
+            hour in 12..17 -> R.drawable.bg_afternoon
+            hour in 18..23 -> R.drawable.bg_evening
+            else -> R.drawable.bg_night
+        }
+
+        // Set the background directly to the SwipeRefreshLayout
+        val swipeRefreshLayout = binding.swipeRefreshLayout // Assuming your SwipeRefreshLayout is defined in the binding
+
+        // Set the background resource directly
+        swipeRefreshLayout.setBackgroundResource(backgroundRes)
+    }
+
+
 
 }

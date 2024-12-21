@@ -13,5 +13,5 @@
     <color name="textPrimary">#FFFFFF</color> <!-- Màu chữ chính -->
     <color name="textSecondary">#CCCCCC</color> <!-- Màu chữ phụ -->
     <color name="textButton">#4CAF50</color> <!-- Màu chữ cho nút -->
-
+    <color name="background_manager_location">#FFFBFF</color>
 </resources>

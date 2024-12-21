@@ -1,10 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.AppCompatTextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/textRemoteLocation"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/_8sdp"
-    android:paddingBottom="@dimen/_8sdp"
-    android:textColor="@color/raisin_black"
-    android:textSize="@dimen/_12ssp"
-    android:text="An Nhơn, Quy Nhơn, Việt Nam"/>
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:background="?android:attr/selectableItemBackground"
+    android:gravity="center_vertical">
+
+    <!-- Tên vị trí -->
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/textRemoteLocation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/raisin_black"
+        android:textSize="@dimen/_12ssp"
+        android:text="An Nhơn, Quy Nhơn, Việt Nam"
+        android:ellipsize="end"
+        android:singleLine="true" />
+
+    <!-- Icon trái tim (yêu thích) -->
+    <ImageView
+        android:id="@+id/imageFavorite"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_favorite_border"
+        android:contentDescription="@string/favorite_icon"
+        android:visibility="gone"
+        app:tint="#D32F2F" />
+
+    <!-- Nút thêm vị trí -->
+    <ImageButton
+        android:id="@+id/btnAddLocation"
+        android:layout_width="26dp"
+        android:layout_height="56dp"
+        android:contentDescription="@string/add_location"
+        android:src="@drawable/ic_add_location"
+        app:tint="@color/raisin_black" />
+
+
+
+
+</LinearLayout>
